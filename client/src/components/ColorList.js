@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import APIServices from "../utils/apiServices";
 import { Button, Header, Form, Grid, List, Modal } from "semantic-ui-react";
 import { Formik } from "formik";
+import ColorForm from "./ColorForm";
+import { colors as colorCatalog } from "../data/colors.js";
 const api = new APIServices();
 
 const initialColor = {
@@ -29,6 +31,9 @@ const ColorList = ({ colors, updateColors }) => {
       })
       .catch(errors => {
         console.log(errors.response);
+      })
+      .then(() => {
+        setEditing(false);
       });
   };
   const handleDeletedColor = deletedColorID => {
@@ -49,6 +54,18 @@ const ColorList = ({ colors, updateColors }) => {
     updateColors(newColorList);
   };
 
+  const handleRandomColor = () => {
+    const colorIndex =
+      Math.floor(Math.random() * (colorCatalog.length - 0)) + 0;
+    const randomColor = colorCatalog[colorIndex];
+
+    setColorToEdit({
+      id: colorToEdit.id,
+      color: randomColor.Name,
+      code: { hex: randomColor["Hex (24 bit)"] }
+    });
+  };
+
   return (
     <>
       <Grid columns={2} container padded="vertically">
@@ -63,7 +80,7 @@ const ColorList = ({ colors, updateColors }) => {
                 <List.Item key={color.id}>
                   <Grid columns={3}>
                     <Grid.Row verticalAlign="middle">
-                      <Grid.Column textAlign="left" width={4}>
+                      <Grid.Column textAlign="left" width={6}>
                         <Header as="h4">{color.color}</Header>
                       </Grid.Column>
                       <Grid.Column textAlign="right" width={3}>
@@ -116,34 +133,12 @@ const ColorList = ({ colors, updateColors }) => {
                       actions.setSubmitting(false);
                     });
                 }}
-                render={props => (
-                  <Form onSubmit={props.handleSubmit}>
-                    <Header>Edit Color</Header>
-                    <Form.Field>
-                      <label htmlFor="color">Color Name</label>
-                      <input
-                        name="color"
-                        onChange={props.handleChange}
-                        type="text"
-                        value={props.values.color}
-                      />
-                    </Form.Field>
-                    <Form.Field>
-                      <label htmlFor="code">Hex Code</label>
-                      <input
-                        name="code"
-                        onChange={props.handleChange}
-                        type="text"
-                        value={props.values.code}
-                      />
-                    </Form.Field>
-                    <Button loading={props.isSubmitting} primary type="submit">
-                      Save
-                    </Button>
-                    <Button secondary onClick={() => setEditing(false)}>
-                      Cancel
-                    </Button>
-                  </Form>
+                render={formikProps => (
+                  <ColorForm
+                    props={formikProps}
+                    setEditing={setEditing}
+                    getRandomColor={handleRandomColor}
+                  />
                 )}
               />
             )}
