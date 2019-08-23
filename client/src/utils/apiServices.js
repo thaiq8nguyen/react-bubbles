@@ -29,6 +29,9 @@ class API {
     //console.log(colorID);
     return this.client.delete(`/colors/${colorID}`);
   }
+  addColor(color) {
+    return this.client.post("/colors", color);
+  }
 }
 
 export default API;

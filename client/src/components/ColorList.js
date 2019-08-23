@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import APIServices from "../utils/apiServices";
-import { Button, Header, Form, Grid, List } from "semantic-ui-react";
+import { Button, Header, Form, Grid, List, Modal } from "semantic-ui-react";
 import { Formik } from "formik";
 const api = new APIServices();
 
@@ -12,6 +12,7 @@ const initialColor = {
 const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const editColor = color => {
     setEditing(true);
@@ -35,8 +36,6 @@ const ColorList = ({ colors, updateColors }) => {
       return color.id !== deletedColorID;
     });
 
-    console.log(newColorList);
-
     updateColors(newColorList);
   };
   const handleEditedColorList = editedColor => {
@@ -46,7 +45,7 @@ const ColorList = ({ colors, updateColors }) => {
       }
       return color;
     });
-
+    setEditing(false);
     updateColors(newColorList);
   };
 
@@ -56,6 +55,9 @@ const ColorList = ({ colors, updateColors }) => {
         <Grid.Row>
           <Grid.Column>
             <Header>Color List</Header>
+            <Button onClick={() => setModalOpen(true)} primary>
+              Add Color
+            </Button>
             <List>
               {colors.map(color => (
                 <List.Item key={color.id}>
@@ -148,6 +150,56 @@ const ColorList = ({ colors, updateColors }) => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
+      <Modal closeIcon onClose={() => setModalOpen(false)} open={modalOpen}>
+        <Modal.Header>Add New Color</Modal.Header>
+
+        <Formik
+          initialValues={{ color: "", code: "" }}
+          onSubmit={(values, actions) => {
+            actions.setSubmitting(true);
+            api
+              .addColor({ color: values.color, code: { hex: values.code } })
+              .then(response => {
+                updateColors(response.data);
+              })
+              .catch(errors => {
+                console.log(errors.response);
+              })
+              .then(() => {
+                actions.setSubmitting(true);
+                setModalOpen(false);
+              });
+          }}
+          render={props => (
+            <Modal.Content>
+              <Form onSubmit={props.handleSubmit}>
+                <Header>Add Color</Header>
+                <Form.Field>
+                  <label htmlFor="color">Color Name</label>
+                  <input
+                    name="color"
+                    onChange={props.handleChange}
+                    type="text"
+                    value={props.values.color}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label htmlFor="code">Hex Code</label>
+                  <input
+                    name="code"
+                    onChange={props.handleChange}
+                    type="text"
+                    value={props.values.code}
+                  />
+                </Form.Field>
+                <Button loading={props.isSubmitting} primary type="submit">
+                  Add
+                </Button>
+              </Form>
+            </Modal.Content>
+          )}
+        />
+      </Modal>
     </>
   );
 };
