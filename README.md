@@ -20,9 +20,9 @@ Commit your code regularly and meaningfully. This helps both you (in case you ev
 
 In this project you will create a login page and request a token from the server that you'll use to send all other requests to the server. You will then be able to fetch the color data array, update data, and delete data, and watch the fun happen!
 
-**Note** Utilize the following to help design the Data for your Application:
+**Note** You can use the sites like the following to get color hex codes:
 
-- [Here](http://smurfs.wikia.com/wiki/Category:Sm)
+- [Color-Hex](https://www.color-hex.com/)
 
 ## Self-Study/Essay Questions
 
@@ -30,7 +30,7 @@ Demonstrate your understanding of this Sprint's concepts by answering the follow
 
 - [ ] Explain what a token is used for.
 - [ ] What steps can you take in your web apps to keep your data secure?
-- [ ] 
+- [ ] Describe how web servers work.
 - [ ] Which HTTP methods can be mapped to the CRUD acronym that we use when interfacing with APIs/Servers.
 
 
@@ -66,85 +66,31 @@ The MVP of this project will be broken up between 2 stages. Follow each step.
 Build a login form to authenticate your users.
 
 - [ ] Construct an AXIOS request to retrieve a token from the server. You'll use this token to interact with the API
-- [ ] Display those smurfs in a list on the screen.
-- [ ] Construct an AXIOS request to `POST` to add a Smurf to the Smurf DB you'll need all three fields.
-- [ ] Create a form that will allow users to add Smurfs to the Smurf DB.
-- [ ] If a Smurf is created correctly, you should see a response that is an array of Smurfs with unique id's assigned to each Smurf.
+- [ ] Save the token to localStorage
+- [ ] Build a `axiosWithAuth` module to create an instance of axios with the authentication header
+- [ ] Build a `PrivateRoute` component and use it to protect a route that renders the `BubblesPage` component
 
-- Example:
+### Stage 2 - Consuming the API
 
-```js
-{
-  name: 'Sleepy',
-  age: 323,
-  height: '5cm'
-}
-```
+- [ ] When `BubblePages` renders, make a GET request to fetch the color data for your bubbles.
+- [ ] In `ColorList.js`, complete the `saveEdit` and `deleteColor` functions to make AJAX requests to the API to edit/delete data
+- [ ] Watch and enjoy as your app responds to updates in the data. Check out `Bubbles.js` to see how this is built.
 
-### Stage 2
+### API Documentation
 
-Add a Router to this application by using React Router.
-
-- [ ] You'll start by wrapping your `root` component in the `Router` component.
-- [ ] Declare your routes with `Route`.
-- [ ] Then make it so you can navigate to your routes using `Link`.
-- [ ] Create two `routes` in your `App` component, one at `'/'` for your `Smurfs` component,and one at `/smurf-form` for your form.
-- [ ] Then in your `App` component, create a nav bar that will use `NavLink` to route to your different pages.
+  * **[POST]** * to `/api/login`: returns a token to be added to the header of all other requests. Pass in the following credentials as the `body` of the request: `{ username: 'Lambda School', password: 'i<3Lambd4' }`
+  * **[GET]** to `/api/colors`: returns the list of colors and their hex codes.
+  * **[POST]** to `/api/colors`: creates a new color object. Pass the color as the `body` of the request (the second argument passed to `axios.post`).
+  * **[PUT]** to `/api/colors/:id`: updates the color using the `id` passed as part of the URL. Send the color object with the updated information as the `body` of the request (the second argument passed to `axios.put`).
+  * **[DELETE]** to `/api/colors/123`: removes the color using the `id` passed as part of the URL (123 in example).
 
 ## STRETCH PROBLEMS
 
 **HTTP/Axios Stretch Problems**
 
-- [ ] The following two endpoints are here for you if you'd like to push yourselves a little further.
+- [ ] Build a form at the bottom of `ColorList.js` to add new colors to the colors data
 
-- [ ] **HINT** if you are going to be working on Stretch Problem, you'll need to use that unique `id`.
+**Data Visualization**
 
-**DELETE '/smurfs/123', where 123 is the Id of the smurf you want to remove**
-
-- [ ] For this endpoint to work, all you need is an id sent up as part of the request url.
-
-- [ ] If your delete worked, you'll get a list of the smurfs back.
-- [ ] Example:
-
-```js
-// output: `A list of all the smurfs in the Smurf DB will be returned`
-[
-  {
-    name: 'Brainy',
-    age: 211,
-    height: '5cm',
-    id: 0
-  },
-  {
-    name: 'Smurfette',
-    age: 122,
-    height: '12cm',
-    id: 1
-  }
-];
-```
-
-**PUT '/smurfs/123', where 123 is the Id of the smurf you want to modify**
-
-- [ ] For this endpoint to work, you'll need an `id` added to the URL, and at least one field to update on the Smurf object. `name` `age` `height`.
-- [ ] Example:
-
-```js
-// input:
-{
-  id: 1,
-  name: Sleepy
-}
-// output: `A list of all the smurfs in the Smurf DB will be returned`
-[{
-  name: 'Sleepy',
-  age: 30,
-  height: '3cm,
-  id: 1
-}]
-```
-
-**Router Stretch Problem**
-
-- [ ] If a user clicks on a smurf, they should be routed to `/smurf/:id` and a single smurf should be displayed on the page.
-- [ ] I know this seems like a small task, but you'll have to get crafty with your data and your logic here.
+- [ ] Look at [Potion JS](https://potion.js.org/). This is the library used to display the color data
+- [ ] Play around with the data visualation happening in `Bubbles.js`. Have fun with this! Try different components from the library, or see if you can add props to change the UI a bit.
