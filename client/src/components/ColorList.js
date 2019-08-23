@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
+import APIServices from "../utils/apiServices";
+import { Button, Header, Form, Grid, List, Modal } from "semantic-ui-react";
+import { Formik } from "formik";
+import ColorForm from "./ColorForm";
+import { colors as colorCatalog } from "../data/colors.js";
+const api = new APIServices();
 
 const initialColor = {
   color: "",
@@ -7,78 +12,190 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
   };
 
-  const saveEdit = e => {
-    e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+  const deleteColor = color => {
+    api
+      .deleteColor(color.id)
+      .then(response => {
+        console.log(response.data);
+
+        handleDeletedColor(response.data);
+      })
+      .catch(errors => {
+        console.log(errors.response);
+      })
+      .then(() => {
+        setEditing(false);
+      });
+  };
+  const handleDeletedColor = deletedColorID => {
+    const newColorList = colors.filter(color => {
+      return color.id !== deletedColorID;
+    });
+
+    updateColors(newColorList);
+  };
+  const handleEditedColorList = editedColor => {
+    const newColorList = colors.map(color => {
+      if (color.id === editedColor.id) {
+        color = editedColor;
+      }
+      return color;
+    });
+    setEditing(false);
+    updateColors(newColorList);
   };
 
-  const deleteColor = color => {
-    // make a delete request to delete this color
+  const handleRandomColor = () => {
+    const colorIndex =
+      Math.floor(Math.random() * (colorCatalog.length - 0)) + 0;
+    const randomColor = colorCatalog[colorIndex];
+
+    setColorToEdit({
+      id: colorToEdit.id,
+      color: randomColor.Name,
+      code: { hex: randomColor["Hex (24 bit)"] }
+    });
   };
 
   return (
-    <div className="colors-wrap">
-      <p>colors</p>
-      <ul>
-        {colors.map(color => (
-          <li key={color.color} onClick={() => editColor(color)}>
-            <span>
-              <span className="delete" onClick={() => deleteColor(color)}>
-                x
-              </span>{" "}
-              {color.color}
-            </span>
-            <div
-              className="color-box"
-              style={{ backgroundColor: color.code.hex }}
-            />
-          </li>
-        ))}
-      </ul>
-      {editing && (
-        <form onSubmit={saveEdit}>
-          <legend>edit color</legend>
-          <label>
-            color name:
-            <input
-              onChange={e =>
-                setColorToEdit({ ...colorToEdit, color: e.target.value })
-              }
-              value={colorToEdit.color}
-            />
-          </label>
-          <label>
-            hex code:
-            <input
-              onChange={e =>
-                setColorToEdit({
-                  ...colorToEdit,
-                  code: { hex: e.target.value }
-                })
-              }
-              value={colorToEdit.code.hex}
-            />
-          </label>
-          <div className="button-row">
-            <button type="submit">save</button>
-            <button onClick={() => setEditing(false)}>cancel</button>
-          </div>
-        </form>
-      )}
-      <div className="spacer" />
-      {/* stretch - build another form here to add a color */}
-    </div>
+    <>
+      <Grid columns={2} container padded="vertically">
+        <Grid.Row>
+          <Grid.Column>
+            <Header>Color List</Header>
+            <Button onClick={() => setModalOpen(true)} primary>
+              Add Color
+            </Button>
+            <List>
+              {colors.map(color => (
+                <List.Item key={color.id}>
+                  <Grid columns={3}>
+                    <Grid.Row verticalAlign="middle">
+                      <Grid.Column textAlign="left" width={6}>
+                        <Header as="h4">{color.color}</Header>
+                      </Grid.Column>
+                      <Grid.Column textAlign="right" width={3}>
+                        <Button onClick={() => editColor(color)} size="tiny">
+                          Edit
+                        </Button>
+                      </Grid.Column>
+                      <Grid.Column textAlign="right" width={3}>
+                        <Button
+                          onClick={() => deleteColor(color)}
+                          color="red"
+                          size="tiny"
+                        >
+                          Delete
+                        </Button>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </List.Item>
+              ))}
+            </List>
+          </Grid.Column>
+          <Grid.Column>
+            {editing && (
+              <Formik
+                enableReinitialize
+                initialValues={{
+                  id: colorToEdit.id,
+                  color: colorToEdit.color,
+                  code: colorToEdit.code.hex
+                }}
+                onSubmit={(values, actions) => {
+                  actions.setSubmitting(true);
+                  const editedColor = {
+                    id: values.id,
+                    color: values.color,
+                    code: {
+                      hex: values.code
+                    }
+                  };
+                  api
+                    .editColor(editedColor)
+                    .then(response => {
+                      handleEditedColorList(response.data);
+                    })
+                    .catch(errors => {
+                      console.log(errors.response);
+                    })
+                    .then(() => {
+                      actions.setSubmitting(false);
+                    });
+                }}
+                render={formikProps => (
+                  <ColorForm
+                    props={formikProps}
+                    setEditing={setEditing}
+                    getRandomColor={handleRandomColor}
+                  />
+                )}
+              />
+            )}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <Modal closeIcon onClose={() => setModalOpen(false)} open={modalOpen}>
+        <Modal.Header>Add New Color</Modal.Header>
+
+        <Formik
+          initialValues={{ color: "", code: "" }}
+          onSubmit={(values, actions) => {
+            actions.setSubmitting(true);
+            api
+              .addColor({ color: values.color, code: { hex: values.code } })
+              .then(response => {
+                updateColors(response.data);
+              })
+              .catch(errors => {
+                console.log(errors.response);
+              })
+              .then(() => {
+                actions.setSubmitting(true);
+                setModalOpen(false);
+              });
+          }}
+          render={props => (
+            <Modal.Content>
+              <Form onSubmit={props.handleSubmit}>
+                <Header>Add Color</Header>
+                <Form.Field>
+                  <label htmlFor="color">Color Name</label>
+                  <input
+                    name="color"
+                    onChange={props.handleChange}
+                    type="text"
+                    value={props.values.color}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label htmlFor="code">Hex Code</label>
+                  <input
+                    name="code"
+                    onChange={props.handleChange}
+                    type="text"
+                    value={props.values.code}
+                  />
+                </Form.Field>
+                <Button loading={props.isSubmitting} primary type="submit">
+                  Add
+                </Button>
+              </Form>
+            </Modal.Content>
+          )}
+        />
+      </Modal>
+    </>
   );
 };
 
