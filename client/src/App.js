@@ -5,7 +5,6 @@ import Login from "./components/Login";
 import "./styles.scss";
 
 function App() {
-  const [colorList, setColorList] = useState([]);
   return (
     <Router>
       <div className="App">
