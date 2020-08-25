@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { axiosWithAuth } from '../utils/axiosWithAuth'
+import { axiosWithAuth } from '../utilities/axiosWithAuth'
 
 const Login = (props) => {
   // make a post request to retrieve a token from the api
