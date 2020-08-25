@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Pack } from "@potion/layout";
-import { Svg, Circle } from "@potion/element";
+import React, { useState, useEffect } from "react"
+import { Pack, Chord } from "@potion/layout"
+import { Svg, Circle } from "@potion/element"
+import Ribbon from "@potion/element/lib/Ribbon"
 
 const Bubbles = ({ colors }) => {
   const [bubbleData, setBubbleData] = useState([]);
+  console.log(bubbleData)
   useEffect(() => {
     const generateBubbleData = colors.map((_, i) => ({
       value: Math.floor(Math.random() * (colors.length * 2)) + 1,
       key: `${i + 1}`
-    }));
+    }))
     setBubbleData(generateBubbleData);
-  }, [colors]);
-
+  }, [colors])
+  const codes = colors.map(item => item.code)
+  const hexes = codes.map(item => item.hex)
+  console.log(hexes)
+  
   return (
     <div className="bubble-wrap">
       <p>bubbles</p>
@@ -47,7 +52,7 @@ const Bubbles = ({ colors }) => {
         </Pack>
       </Svg>
     </div>
-  );
-};
+  )
+}
 
-export default Bubbles;
+export default Bubbles
