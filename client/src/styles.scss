@@ -13,7 +13,7 @@ body,
 .App {
   font-family: "Montserrat", sans-serif;
   text-align: center;
-  display: flex;
+  // display: flex;
 
   svg {
     height: 100%;
@@ -25,15 +25,24 @@ body,
 }
 
 .bubble-wrap {
-  margin: 0 auto;
+  // height: 100%;
+  width: 500px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  padding: 20px;
+  margin: 20px auto;
+  align-items: center;
 }
 
 .colors-wrap {
-  height: 100%;
-  width: 300px;
+  // height: 100%;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  padding: 20px;
+  margin: 20px auto;
 
   ul {
     list-style: none;
@@ -64,6 +73,7 @@ form {
   margin-top: 60px;
   display: flex;
   flex-direction: column;
+  align-items: center;
 
   legend {
     padding-left: 40px;
@@ -80,7 +90,8 @@ form {
   }
 
   input {
-    width: 100px;
+    width: 400px;
+    margin-bottom: 10px;
   }
 }
 
