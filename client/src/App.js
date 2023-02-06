@@ -6,6 +6,7 @@ import './styles.scss';
 import { PrivateRoute } from './utils/PrivateRoute';
 
 function App() {
+  // Authenitcation routes (Protected Routes).
   return (
     <Router>
       <div className="App">

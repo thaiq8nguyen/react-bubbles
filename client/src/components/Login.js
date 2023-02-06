@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { AUTH_TOKEN } from '../utils/constants';
-import { axiosWithAuth } from '../utils/axiosWithAuth';
 import { useHistory } from 'react-router-dom';
+import { Authenticate } from '../api';
 
 const Login = () => {
   const history = useHistory();
+  // remove testing data before pushing.
   const [form, setForm] = useState({
     username: 'Lambda School',
     password: 'i<3Lambd4',
   });
-
+  // create a service for axios.
   const handleSubmit = () => {
-    axiosWithAuth()
-      .post('http://localhost:5000/api/login', {
-        username: form.username,
-        password: form.password,
-      })
+    //  .env file for base_url
+    Authenticate(form)
       .then(function ({ data }) {
+        debugger;
         localStorage.setItem(AUTH_TOKEN, data.payload);
         setForm({ username: '', password: '' });
         history.push('/bubbles');
@@ -28,7 +27,7 @@ const Login = () => {
 
   useEffect(() => {
     if (localStorage.getItem(AUTH_TOKEN)) history.push('/bubbles');
-  }, [history]);
+  }, []);
 
   return (
     <>
